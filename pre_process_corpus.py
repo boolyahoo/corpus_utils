@@ -155,14 +155,12 @@ if __name__ == "__main__":
     dictionary_file_name = "corpus/people_daily_dictionary.txt"
     # 不包含标注的文件
     corpus_pure_file_name = "corpus/people_daily_pure.txt"
-
     # 原始语料文件
     sentences = codecs.open(corpus_file_name, "r", "utf-8").readlines()
     # 词典文件
     dictionary_file = codecs.open(dictionary_file_name, "w", "utf-8")
     # 不包含标注的语料
     corpus_pure_file = codecs.open(corpus_pure_file_name, "w", "utf-8")
-
     dictionary = {}
     count = 0
     for line in sentences:
