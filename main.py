@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-
 import json
 import codecs
 import re
@@ -12,13 +11,6 @@ import xlrd
 ENCODING_UTF_8 = "utf-8"
 LINE_BREAK = "\n"
 MAX_SENTENCE_LENGTH = 120
-
-
-def test():
-    file = codecs.open("corpus/dic.data", "r", ENCODING_UTF_8)
-    for line in file.readlines():
-        for i in range(len(line)):
-            print i
 
 
 def clean(root_dir, dst_file_name):
@@ -233,8 +225,13 @@ def tags2words(tags, chars):
     words = []
     i = 1
     while i < L:
-        if tags[i] == "B" or tags[i] == "S":
-            # 当前标签为B或者S的时候，生成一个单词
+        if tags[i] == "E" or tags[i] == "S":
+            # 当前字符是词尾
+            word += "%d" % i if chars is None else chars[i]
+            words.append(word)
+            word = ""
+        elif tags[i] == "B":
+            # 当前字符是单字词
             words.append(word)
             word = "%d" % i if chars is None else chars[i]
         else:
@@ -267,14 +264,7 @@ def dir_walk(root_dir):
     walk from root dir to extract word from file
     :param root_dir: root dir
     :return:
-    .xlsx
-.dic
-.txt
-.xls
-.pdf
-.zip
     """
-    extensions = {}
     dict = {}
     dst_file = codecs.open("corpus/dic/dic_collection.data", "w", ENCODING_UTF_8)
 
@@ -284,16 +274,18 @@ def dir_walk(root_dir):
             if os.path.isdir(path):
                 walk(path)
             else:
-                match = re.search(r"(txt|dic)$", path)
-                if match is not None:
-                    handle_txt(path, dict)
-                match = re.search(r"(xls)$", path)
+                match = re.search(r"(xlsx|xls)$", path)
                 if match is not None:
                     handle_excel(path, dict)
+                match = re.search(r"(dic|txt)$", path)
+                if match is not None:
+                    handle_txt(path, dict)
 
     walk(root_dir)
 
-    for k, v in dict.items():
+    words = dict.items()
+    words.sort()
+    for k, v in words:
         dst_file.write(k + LINE_BREAK)
 
 
@@ -311,6 +303,7 @@ def handle_excel(src_file, dict):
 
 
 def handle_txt(src_file, dict):
+    print type(dict)
     print "begin handling file %s" % src_file
     for line in codecs.open(src_file, "r", ENCODING_UTF_8).read().splitlines():
         words = re.findall(u"[\u4e00-\u9fa5]+", line)
@@ -319,7 +312,7 @@ def handle_txt(src_file, dict):
 
 
 def test():
-    file_name = "corpus/dic/词库/卫宁词库/标准编码/项目/2017安徽物价/安徽物价-临床各系统诊疗.xls"
+    file_name = "corpus/dic/词库/卫宁词库/标准编码/药品/安徽省药品信息编码库3.0版.xlsx"
 
     wb = xlrd.open_workbook(file_name)
     for sheet in wb.sheets():
@@ -335,4 +328,4 @@ def test():
 
 
 if __name__ == "__main__":
-    dir_walk("corpus/dic")
+    print 11
