@@ -328,4 +328,18 @@ def test():
 
 
 if __name__ == "__main__":
-    print 11
+    dic_short_file = codecs.open("corpus/test/dic_short.data", "w", ENCODING_UTF_8)
+    dic_short = {}
+
+    with codecs.open("corpus/test/dic_final.data", "r", ENCODING_UTF_8) as src:
+        for word in src.read().splitlines():
+            if not dic_short.has_key(word):
+                dic_short.setdefault(word, -1)
+            else:
+                continue
+
+    sitems = dic_short.items()
+    sitems.sort()
+    for word, v in sitems:
+        dic_short_file.write(word + LINE_BREAK)
+    dic_short_file.close()
